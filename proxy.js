@@ -47,22 +47,22 @@ const PROXY_STATUS_CLOSED = 'CLOSED';
  */
 class ProxyCore extends events.EventEmitter {
 
-  /**
-   * Creates an instance of ProxyCore.
-   *
-   * @param {object} config - configs
-   * @param {number} config.port - port of the proxy server
-   * @param {object} [config.rule=null] - rule module to use
-   * @param {string} [config.type=http] - type of the proxy server, could be 'http' or 'https'
-   * @param {strign} [config.hostname=localhost] - host name of the proxy server, required when this is an https proxy
-   * @param {number} [config.throttle] - speed limit in kb/s
-   * @param {boolean} [config.forceProxyHttps=false] - if proxy all https requests
-   * @param {boolean} [config.silent=false] - if keep the console silent
-   * @param {boolean} [config.dangerouslyIgnoreUnauthorized=false] - if ignore unauthorized server response
-   * @param {object} [config.recorder] - recorder to use
-   *
-   * @memberOf ProxyCore
-   */
+    /**
+     * Creates an instance of ProxyCore.
+     *
+     * @param {object} config - configs
+     * @param {number} config.port - port of the proxy server
+     * @param {object} [config.rule=null] - rule module to use
+     * @param {string} [config.type=http] - type of the proxy server, could be 'http' or 'https'
+     * @param {strign} [config.hostname=localhost] - host name of the proxy server, required when this is an https proxy
+     * @param {number} [config.throttle] - speed limit in kb/s
+     * @param {boolean} [config.forceProxyHttps=false] - if proxy all https requests
+     * @param {boolean} [config.silent=false] - if keep the console silent
+     * @param {boolean} [config.dangerouslyIgnoreUnauthorized=false] - if ignore unauthorized server response
+     * @param {object} [config.recorder] - recorder to use
+     *
+     * @memberOf ProxyCore
+     */
   constructor(config) {
     super();
     config = config || {};
@@ -88,7 +88,7 @@ class ProxyCore extends events.EventEmitter {
     this.httpProxyServer = null;
     this.requestHandler = null;
 
-    // copy the rule to keep the original proxyRule independent
+        // copy the rule to keep the original proxyRule independent
     this.proxyRule = config.rule || {};
 
     if (config.silent) {
@@ -104,10 +104,10 @@ class ProxyCore extends events.EventEmitter {
       global._throttle = new ThrottleGroup({ rate: 1024 * rate }); // rate - byte/sec
     }
 
-    // init recorder
+        // init recorder
     this.recorder = config.recorder;
 
-    // init request handler
+        // init request handler
     const RequestHandler = util.freshRequire('./requestHandler');
     this.requestHandler = new RequestHandler({
       forceProxyHttps: !!config.forceProxyHttps,
@@ -115,13 +115,13 @@ class ProxyCore extends events.EventEmitter {
     }, this.proxyRule, this.recorder);
   }
 
-  /**
-   * start the proxy server
-   *
-   * @returns ProxyCore
-   *
-   * @memberOf ProxyCore
-   */
+    /**
+     * start the proxy server
+     *
+     * @returns ProxyCore
+     *
+     * @memberOf ProxyCore
+     */
   start() {
     const self = this;
     if (self.status !== PROXY_STATUS_INIT) {
@@ -129,7 +129,7 @@ class ProxyCore extends events.EventEmitter {
     }
     async.series(
       [
-        //creat proxy server
+                //creat proxy server
         function (callback) {
           if (self.proxyType === T_TYPE_HTTPS) {
             certMgr.getCertificate(self.proxyHostName, (err, keyContent, crtContent) => {
@@ -149,80 +149,81 @@ class ProxyCore extends events.EventEmitter {
           }
         },
 
-        //handle CONNECT request for https over http
+                //handle CONNECT request for https over http
         function (callback) {
           self.httpProxyServer.on('connect', self.requestHandler.connectReqHandler);
 
           callback(null);
         },
 
-        //start proxy server
+                //start proxy server
         function (callback) {
           self.httpProxyServer.listen(self.proxyPort);
           callback(null);
         },
       ],
 
-      //final callback
-      (err, result) => {
-        if (!err) {
-          const tipText = (self.proxyType === T_TYPE_HTTP ? 'Http' : 'Https') + ' proxy started on port ' + self.proxyPort;
-          logUtil.printLog(color.green(tipText));
+            //final callback
+            (err, result) => {
+              if (!err) {
+                const tipText = (self.proxyType === T_TYPE_HTTP ? 'Http' : 'Https') + ' proxy started on port ' + self.proxyPort;
+                logUtil.printLog(color.green(tipText));
 
-          if (self.webServerInstance) {
-            const webTip = 'web interface started on port ' + self.webServerInstance.webPort;
-            logUtil.printLog(color.green(webTip));
-          }
+                if (self.webServerInstance) {
+                  const webTip = 'web interface started on port ' + self.webServerInstance.webPort;
+                  logUtil.printLog(color.green(webTip));
+                }
 
-          let ruleSummaryString = '';
-          const ruleSummary = this.proxyRule.summary;
-          if (ruleSummary) {
-            co(function *() {
-              if (typeof ruleSummary === 'string') {
-                ruleSummaryString = ruleSummary;
+                let ruleSummaryString = '';
+                const ruleSummary = this.proxyRule.summary;
+                if (ruleSummary) {
+                  co(function *() {
+                    if (typeof ruleSummary === 'string') {
+                      ruleSummaryString = ruleSummary;
+                    } else {
+                      ruleSummaryString = yield ruleSummary();
+                    }
+
+                    logUtil.printLog(color.green(`Active rule is: ${ruleSummaryString}`));
+                  });
+                }
+
+                self.status = PROXY_STATUS_READY;
+                self.emit('ready');
               } else {
-                ruleSummaryString = yield ruleSummary();
+                const tipText = 'err when start proxy server :(';
+                logUtil.printLog(color.red(tipText), logUtil.T_ERR);
+                logUtil.printLog(err, logUtil.T_ERR);
+                self.emit('error', {
+                  error: err
+                });
               }
-
-              logUtil.printLog(color.green(`Active rule is: ${ruleSummaryString}`));
-            });
-          }
-
-          self.status = PROXY_STATUS_READY;
-          self.emit('ready');
-        } else {
-          const tipText = 'err when start proxy server :(';
-          logUtil.printLog(color.red(tipText), logUtil.T_ERR);
-          logUtil.printLog(err, logUtil.T_ERR);
-          self.emit('error', {
-            error: err
-          });
-        }
-      }
-    );
+            }
+        );
 
     return self;
   }
 
 
-  /**
-   * close the proxy server
-   *
-   * @returns ProxyCore
-   *
-   * @memberOf ProxyCore
-   */
+    /**
+     * close the proxy server
+     *
+     * @returns ProxyCore
+     *
+     * @memberOf ProxyCore
+     */
   close() {
-    // clear recorder cache
+        // clear recorder cache
 
-    // destroy conns & cltSockets when close proxy server
-    for(const [ key, conn ] of this.requestHandler.conns){
+        // destroy conns & cltSockets when close proxy server
+    for (const [, conn] of this.requestHandler.conns) {
       conn.destroy()
     }
-    for(const [ key, cltSocket ] of this.requestHandler.cltSockets){
+    for (const [, cltSocket] of this.requestHandler.cltSockets) {
       cltSocket.destroy()
     }
 
+    this.requestHandler.sqlConn.end()
     this.httpProxyServer && this.httpProxyServer.close();
     this.httpProxyServer = null;
 
@@ -237,16 +238,16 @@ class ProxyCore extends events.EventEmitter {
  * start proxy server as well as recorder and webInterface
  */
 class ProxyServer extends ProxyCore {
-  /**
-   *
-   * @param {object} config - config
-   * @param {object} [config.webInterface] - config of the web interface
-   * @param {boolean} [config.webInterface.enable=false] - if web interface is enabled
-   * @param {number} [config.webInterface.webPort=8002] - http port of the web interface
-   * @param {number} [config.webInterface.wsPort] - web socket port of the web interface
-   */
+    /**
+     *
+     * @param {object} config - config
+     * @param {object} [config.webInterface] - config of the web interface
+     * @param {boolean} [config.webInterface.enable=false] - if web interface is enabled
+     * @param {number} [config.webInterface.webPort=8002] - http port of the web interface
+     * @param {number} [config.webInterface.wsPort] - web socket port of the web interface
+     */
   constructor(config) {
-    // prepare a recorder
+        // prepare a recorder
     const recorder = new Recorder();
     const configForCore = Object.assign({
       recorder,
@@ -260,19 +261,19 @@ class ProxyServer extends ProxyCore {
   }
 
   start() {
-    // start web interface if neeeded
+        // start web interface if neeeded
     if (this.proxyWebinterfaceConfig && this.proxyWebinterfaceConfig.enable) {
       this.webServerInstance = new WebInterface(this.proxyWebinterfaceConfig, this.recorder);
     }
 
-    // start web server
+        // start web server
     this.webServerInstance.start().then(() => {
-      // start proxy core
+            // start proxy core
       super.start();
     })
-    .catch(e => {
-      this.emit('error', e);
-    });
+            .catch(e => {
+              this.emit('error', e);
+            });
   }
 
   close() {
