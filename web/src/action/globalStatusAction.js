@@ -22,6 +22,9 @@ export const UPDATE_LOCAL_GLOBAL_PROXY_FLAG = 'UPDATE_LOCAL_GLOBAL_PROXY_FLAG';
 export const SHOW_ROOT_CA = 'SHOW_ROOT_CA';
 export const HIDE_ROOT_CA = 'HIDE_ROOT_CA';
 
+export const SHOW_MOCK = 'SHOW_MOCK';
+export const CONNECT_DATABASE = 'CONNECT_DATABASE';
+
 export const UPDATE_CAN_LOAD_MORE = 'UPDATE_CAN_LOAD_MORE';
 export const INCREASE_DISPLAY_RECORD_LIST = 'INCREASE_DISPLAY_RECORD_LIST';
 export const UPDATE_SHOULD_CLEAR_RECORD = 'UPDATE_SHOULD_CLEAR_RECORD';
@@ -32,186 +35,238 @@ export const UPDATE_IS_ROOTCA_EXISTS = 'UPDATE_IS_ROOTCA_EXISTS';
 export const UPDATE_SHOW_NEW_RECORD_TIP = 'UPDATE_SHOW_NEW_RECORD_TIP';
 // update if currently loading the record from server
 export const UPDATE_FETCHING_RECORD_STATUS = 'UPDATE_FETCHING_RECORD_STATUS';
+import {getJSON, ajaxGet, postJSON} from 'common/ApiUtil';
+
+export function connectDataBase() {
+    return dbConnect();
+}
+
+export function connectingDb() {
+    return {
+        type: CONNECT_DATABASE,
+        loading: true,
+        loadSuccess: false,
+        mockData: [],
+    }
+}
+
+export function connectDbSuccess(mockData) {
+    return {
+        type: CONNECT_DATABASE,
+        loading: false,
+        mockData: mockData,
+        loadSuccess: true,
+    }
+}
+
+export function connectDbError() {
+    return {
+        type: CONNECT_DATABASE,
+        loading: false,
+        loadSuccess: false,
+        mockData: [],
+    }
+}
+
+function dbConnect() {
+    return dispatch => {
+        dispatch(connectingDb());
+        postJSON('http://127.0.0.1:8001/lich.mock_service/connect_db')
+            .then((response) => {
+                dispatch(connectDbSuccess(response.mock_db_infos));
+            })
+            .catch((error) => {
+                dispatch(connectDbError())
+                console.error('connectDbError:' + error)
+            })
+    }
+}
 
 export function stopRecording() {
-  return {
-    type: STOP_RECORDING
-  };
+    return {
+        type: STOP_RECORDING
+    };
 }
 
 export function resumeRecording() {
-  return {
-    type: RESUME_RECORDING
-  };
+    return {
+        type: RESUME_RECORDING
+    };
 }
 
 export function showFilter() {
-  return {
-    type: SHOW_FILTER
-  };
+    return {
+        type: SHOW_FILTER
+    };
+}
+
+export function showMock() {
+    return {
+        type: SHOW_MOCK
+    };
 }
 
 export function hideFilter() {
-  return {
-    type: HIDE_FILTER
-  };
+    return {
+        type: HIDE_FILTER
+    };
 }
 
 export function updateFilter(filterStr) {
-  return {
-    type: UPDATE_FILTER,
-    data: filterStr
-  };
+    return {
+        type: UPDATE_FILTER,
+        data: filterStr
+    };
 }
 
 export function showMapLocal() {
-  return {
-    type: SHOW_MAP_LOCAL
-  };
+    return {
+        type: SHOW_MAP_LOCAL
+    };
 }
 
 export function hideMapLocal() {
-  return {
-    type: HIDE_MAP_LOCAL
-  };
+    return {
+        type: HIDE_MAP_LOCAL
+    };
 }
 
 export function fetchDirectory(path) {
-  return {
-    type: FETCH_DIRECTORY,
-    data: path
-  };
+    return {
+        type: FETCH_DIRECTORY,
+        data: path
+    };
 }
 
 export function updateLocalDirectory(path, sub) {
-  return {
-    type: UPDATE_LOCAL_DIRECTORY,
-    data: {
-      path,
-      sub
-    }
-  };
+    return {
+        type: UPDATE_LOCAL_DIRECTORY,
+        data: {
+            path,
+            sub
+        }
+    };
 }
 
 export function fetchMappedConfig() {
-  return {
-    type: FETCH_MAPPED_CONFIG
-  };
+    return {
+        type: FETCH_MAPPED_CONFIG
+    };
 }
 
 export function updateLocalMappedConfig(config) {
-  return {
-    type: UPDATE_LOCAL_MAPPED_CONFIG,
-    data: config
-  };
+    return {
+        type: UPDATE_LOCAL_MAPPED_CONFIG,
+        data: config
+    };
 }
 
 export function updateRemoteMappedConfig(config) {
-  return {
-    type: UPDATE_REMOTE_MAPPED_CONFIG,
-    data: config
-  };
+    return {
+        type: UPDATE_REMOTE_MAPPED_CONFIG,
+        data: config
+    };
 }
 
 export function updateActiveRecordItem(id) {
-  return {
-    type: UPDATE_ACTIVE_RECORD_ITEM,
-    data: id
-  };
+    return {
+        type: UPDATE_ACTIVE_RECORD_ITEM,
+        data: id
+    };
 }
 
 export function updateLocalInterceptHttpsFlag(flag) {
-  return {
-    type: UPDATE_LOCAL_INTERCEPT_HTTPS_FLAG,
-    data: flag
-  };
+    return {
+        type: UPDATE_LOCAL_INTERCEPT_HTTPS_FLAG,
+        data: flag
+    };
 }
 
 export function toggleRemoteInterceptHttpsFlag(flag) {
-  return {
-    type: TOGGLE_REMOTE_INTERCEPT_HTTPS,
-    data: flag
-  };
+    return {
+        type: TOGGLE_REMOTE_INTERCEPT_HTTPS,
+        data: flag
+    };
 }
 
 export function toggleRemoteGlobalProxyFlag(flag) {
-  return {
-    type: TOGGLE_REMORE_GLOBAL_PROXY_FLAG,
-    data: flag
-  };
+    return {
+        type: TOGGLE_REMORE_GLOBAL_PROXY_FLAG,
+        data: flag
+    };
 }
 
 export function updateLocalGlobalProxyFlag(flag) {
-  return {
-    type: UPDATE_LOCAL_GLOBAL_PROXY_FLAG,
-    data: flag
-  };
+    return {
+        type: UPDATE_LOCAL_GLOBAL_PROXY_FLAG,
+        data: flag
+    };
 }
 
 export function showRootCA() {
-  return {
-    type: SHOW_ROOT_CA
-  };
+    return {
+        type: SHOW_ROOT_CA
+    };
 }
 
 export function hideRootCA() {
-  return {
-    type: HIDE_ROOT_CA
-  };
+    return {
+        type: HIDE_ROOT_CA
+    };
 }
 
 export function updateCanLoadMore(canLoadMore) {
-  return {
-    type: UPDATE_CAN_LOAD_MORE,
-    data: canLoadMore
-  };
+    return {
+        type: UPDATE_CAN_LOAD_MORE,
+        data: canLoadMore
+    };
 }
 
 export function increaseDisplayRecordLimit(moreToAdd) {
-  return {
-    type: INCREASE_DISPLAY_RECORD_LIST,
-    data: moreToAdd
-  };
+    return {
+        type: INCREASE_DISPLAY_RECORD_LIST,
+        data: moreToAdd
+    };
 }
 
 export function updateShouldClearRecord(shouldClear) {
-  return {
-    type: UPDATE_SHOULD_CLEAR_RECORD,
-    data: shouldClear
-  };
+    return {
+        type: UPDATE_SHOULD_CLEAR_RECORD,
+        data: shouldClear
+    };
 }
 
 export function updateLocalAppVersion(version) {
-  return {
-    type: UPDATE_APP_VERSION,
-    data: version
-  };
+    return {
+        type: UPDATE_APP_VERSION,
+        data: version
+    };
 }
 
 export function updateShowNewRecordTip(shouldShow) {
-  return {
-    type: UPDATE_SHOW_NEW_RECORD_TIP,
-    data: shouldShow
-  };
+    return {
+        type: UPDATE_SHOW_NEW_RECORD_TIP,
+        data: shouldShow
+    };
 }
 
 export function updateIsRootCAExists(exists) {
-  return {
-    type: UPDATE_IS_ROOTCA_EXISTS,
-    data: exists
-  };
+    return {
+        type: UPDATE_IS_ROOTCA_EXISTS,
+        data: exists
+    };
 }
 
 export function updateGlobalWsPort(wsPort) {
-  return {
-    type: UPDATE_GLOBAL_WSPORT,
-    data: wsPort
-  }
+    return {
+        type: UPDATE_GLOBAL_WSPORT,
+        data: wsPort
+    }
 }
 
 export function updateFechingRecordStatus(isFetching) {
-  return {
-    type: UPDATE_FETCHING_RECORD_STATUS,
-    data: isFetching
-  }
+    return {
+        type: UPDATE_FETCHING_RECORD_STATUS,
+        data: isFetching
+    }
 }

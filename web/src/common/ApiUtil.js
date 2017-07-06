@@ -26,7 +26,6 @@ export function postJSON(url, data) {
         body: JSON.stringify(data)
     })
         .then((data) => {
-
             d.resolve(data.json());
         })
         .catch((error) => {

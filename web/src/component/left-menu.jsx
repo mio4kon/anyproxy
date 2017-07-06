@@ -1,13 +1,13 @@
 /*
-* A copoment to for left main menu
-*/
+ * A copoment to for left main menu
+ */
 
-import React, { PropTypes } from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import { Icon,  } from 'antd';
-import { connect } from 'react-redux';
+import {Icon,} from 'antd';
+import {connect} from 'react-redux';
 import InlineSVG from 'svg-inline-react';
-import { getQueryParameter } from 'common/CommonUtil';
+import {getQueryParameter} from 'common/CommonUtil';
 
 import Style from './left-menu.less';
 import ClassBind from 'classnames/bind';
@@ -15,20 +15,22 @@ import ClassBind from 'classnames/bind';
 import {
     showFilter,
     showMapLocal,
-    showRootCA
+    showRootCA,
+    showMock
 } from 'action/globalStatusAction';
 
-import { MenuKeyMap } from 'common/Constant';
+import {MenuKeyMap} from 'common/Constant';
 
 const StyleBind = ClassBind.bind(Style);
 const {
     RECORD_FILTER: RECORD_FILTER_MENU_KEY,
     MAP_LOCAL: MAP_LOCAL_MENU_KEY,
-    ROOT_CA: ROOT_CA_MENU_KEY
+    ROOT_CA: ROOT_CA_MENU_KEY,
+    MOCK: MOCK_KEY
 } = MenuKeyMap;
 
 class LeftMenu extends React.Component {
-    constructor () {
+    constructor() {
         super();
 
         this.state = {
@@ -38,6 +40,7 @@ class LeftMenu extends React.Component {
         // this.showMapLocal = this.showMapLocal.bind(this);
         this.showFilter = this.showFilter.bind(this);
         this.showRootCA = this.showRootCA.bind(this);
+        this.showMock = this.showMock.bind(this);
     }
 
     static propTypes = {
@@ -49,16 +52,20 @@ class LeftMenu extends React.Component {
     //     this.props.dispatch(showMapLocal());
     // }
 
-    showFilter () {
+    showFilter() {
         this.props.dispatch(showFilter());
     }
 
-    showRootCA () {
+    showRootCA() {
         this.props.dispatch(showRootCA());
     }
 
-    render () {
-        const { mappedConfig, filterStr, activeMenuKey, recording } = this.props.globalStatus;
+    showMock() {
+        this.props.dispatch(showMock());
+    }
+
+    render() {
+        const {mappedConfig, filterStr, activeMenuKey, recording} = this.props.globalStatus;
         const currentMappedConfig = mappedConfig || [];
 
         const mapLocalMenuStyle = StyleBind('menuItem', {
@@ -67,7 +74,7 @@ class LeftMenu extends React.Component {
         });
 
         const filterMenuStyle = StyleBind('menuItem', {
-            'working': filterStr.length > 0 ,
+            'working': filterStr.length > 0,
             'active': activeMenuKey === RECORD_FILTER_MENU_KEY
         });
 
@@ -75,27 +82,31 @@ class LeftMenu extends React.Component {
             'active': activeMenuKey === ROOT_CA_MENU_KEY
         });
 
-        const wrapperStyle = StyleBind('wrapper', { 'inApp': this.state.inAppMode } );
-        const circleStyle = StyleBind('circles', { 'active': recording, 'stop': !recording });
+        const mockMenuStyle = StyleBind('menuItem', {
+            'active': activeMenuKey === MOCK_KEY
+        });
+
+        const wrapperStyle = StyleBind('wrapper', {'inApp': this.state.inAppMode});
+        const circleStyle = StyleBind('circles', {'active': recording, 'stop': !recording});
 
         return (
-            <div className={wrapperStyle} >
-                <div className={Style.logo} >
-                    <div className={Style.brand} >
+            <div className={wrapperStyle}>
+                <div className={Style.logo}>
+                    <div className={Style.brand}>
                         <span className={Style.any}>Any</span>
                         <span className={Style.proxy}>Proxy</span>
                     </div>
-                    <div className={circleStyle} >
-                        <span className={Style.circle1} />
-                        <span className={Style.circle2} />
-                        <span className={Style.circle3} />
-                        <span className={Style.circle4} />
-                        <span className={Style.circle5} />
-                        <span className={Style.circle6} />
-                        <span className={Style.circle7} />
+                    <div className={circleStyle}>
+                        <span className={Style.circle1}/>
+                        <span className={Style.circle2}/>
+                        <span className={Style.circle3}/>
+                        <span className={Style.circle4}/>
+                        <span className={Style.circle5}/>
+                        <span className={Style.circle6}/>
+                        <span className={Style.circle7}/>
                     </div>
                 </div>
-                <div className={Style.menuList} >
+                <div className={Style.menuList}>
                     <a
                         className={filterMenuStyle}
                         href="javascript:void(0)"
@@ -103,7 +114,7 @@ class LeftMenu extends React.Component {
                         title="Only show the filtered result"
                     >
                         <span className={Style.filterIcon}>
-                            <InlineSVG src={require("svg-inline!assets/filter.svg")} />
+                            <InlineSVG src={require("svg-inline!assets/filter.svg")}/>
                         </span>
                         <span>Filter</span>
                     </a>
@@ -115,17 +126,29 @@ class LeftMenu extends React.Component {
                         title="Download the root CA to the computer and your phone"
                     >
                         <span className={Style.downloadIcon}>
-                            <InlineSVG src={require("svg-inline!assets/download.svg")} />
+                            <InlineSVG src={require("svg-inline!assets/download.svg")}/>
                         </span>
                         <span>RootCA</span>
                     </a>
+
+                    <a
+                        className={mockMenuStyle}
+                        href="javascript:void(0)"
+                        onClick={this.showMock}
+                        title="hot mock server"
+                    >
+                        <span className={Style.downloadIcon}>
+                            <InlineSVG src={require("svg-inline!assets/download.svg")}/>
+                        </span>
+                        <span>Mock</span>
+                    </a>
                 </div>
-                <div className={Style.bottom} >
+                <div className={Style.bottom}>
                     <a className={Style.bottomItem} href="http://anyproxy.io/" target="_blank">AnyProxy.io</a>
-                    <div className={Style.bottomBorder} >
-                        <span className={Style.bottomBorder1} />
-                        <span className={Style.bottomBorder2} />
-                        <span className={Style.bottomBorder3} />
+                    <div className={Style.bottomBorder}>
+                        <span className={Style.bottomBorder1}/>
+                        <span className={Style.bottomBorder2}/>
+                        <span className={Style.bottomBorder3}/>
                     </div>
                     <span className={Style.bottomItem}>
                         Version {this.props.globalStatus.appVersion}
@@ -136,7 +159,7 @@ class LeftMenu extends React.Component {
     }
 }
 
-function select (state) {
+function select(state) {
     return {
         globalStatus: state.globalStatus
     };

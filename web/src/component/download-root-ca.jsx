@@ -3,21 +3,21 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import ClassBind from 'classnames/bind';
-import { connect } from 'react-redux';
-import { message, Button, Spin } from 'antd';
+import {connect} from 'react-redux';
+import {message, Button, Spin} from 'antd';
 import ResizablePanel from 'component/resizable-panel';
-import { hideRootCA, updateIsRootCAExists } from 'action/globalStatusAction';
-import { MenuKeyMap } from 'common/Constant';
-import { getJSON, ajaxGet, postJSON } from 'common/ApiUtil';
+import {hideRootCA, updateIsRootCAExists} from 'action/globalStatusAction';
+import {MenuKeyMap} from 'common/Constant';
+import {getJSON, ajaxGet, postJSON} from 'common/ApiUtil';
 
 import Style from './download-root-ca.less';
 import CommonStyle from '../style/common.less';
 
 class DownloadRootCA extends React.Component {
-    constructor () {
+    constructor() {
         super();
         this.state = {
             loadingCAQr: false,
@@ -33,7 +33,7 @@ class DownloadRootCA extends React.Component {
         globalStatus: PropTypes.object
     }
 
-    fetchData () {
+    fetchData() {
         this.setState({
             loadingCAQr: true
         });
@@ -53,15 +53,15 @@ class DownloadRootCA extends React.Component {
             });
     }
 
-    onClose () {
+    onClose() {
         this.props.dispatch(hideRootCA());
     }
 
-    getQrCodeContent () {
-        const imgDomContent = { __html: this.state.CAQrCodeImageDom };
+    getQrCodeContent() {
+        const imgDomContent = {__html: this.state.CAQrCodeImageDom};
         const content = (
-            <div className={Style.qrCodeWrapper} >
-                <div dangerouslySetInnerHTML={imgDomContent} />
+            <div className={Style.qrCodeWrapper}>
+                <div dangerouslySetInnerHTML={imgDomContent}/>
                 <span>Scan to download rootCA.crt to your Phone</span>
             </div>
         );
@@ -70,9 +70,10 @@ class DownloadRootCA extends React.Component {
         return this.state.loadingCAQr ? spin : content;
     }
 
-    getGenerateRootCADiv () {
+    getGenerateRootCADiv() {
 
         const doToggleRemoteIntercept = () => {
+
             postJSON('/api/generateRootCA')
                 .then((result) => {
                     this.setState({
@@ -91,16 +92,16 @@ class DownloadRootCA extends React.Component {
 
         return (
             <div className={Style.wrapper}>
-                <div className={Style.title} >
+                <div className={Style.title}>
                     RootCA
                 </div>
 
-                <div className={Style.generateRootCaTip} >
+                <div className={Style.generateRootCaTip}>
                     <span >Your RootCA has not been generated yet, please click the button to generate before you download it.</span>
-                    <span className={Style.strongColor} >Please install and trust the generated RootCA.</span>
+                    <span className={Style.strongColor}>Please install and trust the generated RootCA.</span>
                 </div>
 
-                <div className={Style.generateCAButton} >
+                <div className={Style.generateCAButton}>
                     <Button
                         type="primary"
                         size="large"
@@ -114,37 +115,36 @@ class DownloadRootCA extends React.Component {
         );
     }
 
-    getDownloadDiv () {
+    getDownloadDiv() {
         return (
-            <div className={Style.wrapper} >
-                <div className={Style.fullHeightWrapper} >
-                    <div className={Style.title} >
+            <div className={Style.wrapper}>
+                <div className={Style.fullHeightWrapper}>
+                    <div className={Style.title}>
                         RootCA
                     </div>
-                    <div className={Style.arCodeDivWrapper} >
+                    <div className={Style.arCodeDivWrapper}>
                         {this.getQrCodeContent()}
                     </div>
                 </div>
 
-                <div className={Style.buttons} >
+                <div className={Style.buttons}>
                     <a href="/fetchCrtFile" target="_blank">
-                        <Button type="primary" size="large" > Download </Button>
+                        <Button type="primary" size="large"> Download </Button>
                     </a>
-                    <span className={Style.tipSpan} >Or click the button to download.</span>
+                    <span className={Style.tipSpan}>Or click the button to download.</span>
                 </div>
             </div>
         );
     }
 
-    componentDidMount () {
+    componentDidMount() {
         this.fetchData();
     }
 
     render() {
         const panelVisible = this.props.globalStatus.activeMenuKey === MenuKeyMap.ROOT_CA;
-
         return (
-            <ResizablePanel onClose={this.onClose} visible={panelVisible} >
+            <ResizablePanel onClose={this.onClose} visible={panelVisible}>
                 {this.props.globalStatus.isRootCAFileExists ? this.getDownloadDiv() : this.getGenerateRootCADiv()}
 
             </ResizablePanel>
@@ -152,7 +152,7 @@ class DownloadRootCA extends React.Component {
     }
 }
 
-function select (state) {
+function select(state) {
     return {
         globalStatus: state.globalStatus
     };
