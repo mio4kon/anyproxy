@@ -3,7 +3,7 @@
  */
 import React, {PropTypes}  from 'react';
 import {connect} from 'react-redux';
-import {Table, Icon} from 'antd';
+import {Table, Button} from 'antd';
 import Style from './db-login-form.less';
 import {
     connectDataBase
@@ -18,10 +18,27 @@ class DbDataTable extends React.Component {
     static propTypes = {
         dispatch: PropTypes.func,
         globalStatus: PropTypes.object
-    }
+    };
 
+    start = () => {
+        console.log('click');
+    };
+
+    state = {
+        selectedRowKeys: [],
+    };
+
+    onSelectChange = (selectedRowKeys) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        this.setState({ selectedRowKeys });
+    };
 
     getTableContent() {
+        const {selectedRowKeys } = this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+        };
         const mockData = this.props.globalStatus.mockData;
         const tabData = [];
         mockData.forEach((item, index, array) => {
@@ -34,37 +51,6 @@ class DbDataTable extends React.Component {
             };
             tabData.push(temp);
         });
-        const data = [
-            {
-                key: 1,
-                name: 'John Brown',
-                age: 32,
-                address: 'New York No. 1 Lake Park',
-                description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.'
-            },
-            {
-                key: 2,
-                name: 'Jim Green',
-                age: 42,
-                address: 'London No. 1 Lake Park',
-                description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.'
-            },
-            {
-                key: 3,
-                name: 'Joe Black',
-                age: 32,
-                address: 'Sidney No. 1 Lake Park',
-                description: 'My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.'
-            },
-        ];
-
-        const columns2 = [
-            {title: 'Name', dataIndex: 'name', key: 'name'},
-            {title: 'Age', dataIndex: 'age', key: 'age'},
-            {title: 'Address', dataIndex: 'address', key: 'address'},
-            {title: 'Action', dataIndex: '', key: 'x', render: () => <a href="#">Delete</a>},
-        ];
-
         const columns = [{
             title: 'MockUrl',
             dataIndex: 'mock_url',
@@ -82,15 +68,25 @@ class DbDataTable extends React.Component {
         return (
             <Table columns={columns}
                    dataSource={tabData}
+                   rowSelection={rowSelection}
                    expandedRowRender={record => <p>{record.mock_body}</p>}
                    size="middle"/>
         )
     }
 
     render() {
-        // {this.props.globalStatus.loadSuccess ? this.getDataBaseContent() : this.getFormContent()  }
         return (
             <div>
+                <div style={{marginBottom: 16}}>
+                    <Button
+                        type="primary"
+                        onClick={this.start}
+                        disabled={false}
+                    >
+                        Clear
+                    </Button>
+
+                </div>
                 {this.getTableContent()}
             </div>
         )
