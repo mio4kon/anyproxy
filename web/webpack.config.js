@@ -34,53 +34,57 @@ module.exports = {
                 presets: ['es2015', 'stage-0']
             }
         },
-        {
-            test: /\.jsx$/,
-            exclude: /node_modules/,
-            loader: 'babel',
-            query: {
-                presets: ['es2015', 'stage-0', 'react'],
-                plugins: ['transform-runtime', ['import', { 'libraryName': 'antd', style: true }]]
-            }
-        },
-        {
-            test: function (filePath) {
-                return (/antd\/.*\.less$/.test(filePath) || /\.global\.less$/.test(filePath));
+            {
+                test: /\.jsx$/,
+                exclude: /node_modules/,
+                loader: 'babel',
+                query: {
+                    presets: ['es2015', 'stage-0', 'react'],
+                    plugins: ['transform-runtime', ['import', {'libraryName': 'antd', style: true}]]
+                }
             },
-            loader: ExtractTextPlugin.extract('css!postcss!less')
-        },
-        {
-            test: function (filePath) {
-                return (/\.less$/.test(filePath) && !/\.global\.less$/.test(filePath) && !/antd\/.*\.less$/.test(filePath));
+            {
+                test: function (filePath) {
+                    return (/antd\/.*\.less$/.test(filePath) || /\.global\.less$/.test(filePath));
+                },
+                loader: ExtractTextPlugin.extract('css!postcss!less')
             },
-            loader: ExtractTextPlugin.extract('css?modules&localIdentName=[local]___[hash:base64:5]!postcss!less')
-        },
-        {
-            test: /\.css$/,
-            loader: ExtractTextPlugin.extract('css')
-        },
-        {
-            test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-            loader: "url?limit=10000&mimetype=application/font-woff"
-        },
-        {
-            test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-            loader: "url?limit=10000&mimetype=application/font-woff"
-        },
-        {
-            test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-            loader: "url?limit=10000&mimetype=application/octet-stream"
-        },
-        {
-            test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-            loader: "url?limit=10000&mimetype=application/octet-stream"
-        },
-        {
-            test: /font\.svg(\?v=\d+\.\d+\.\d+)?$/,
-            loader: "url?limit=10000&mimetype=image/svg+xml"
-        }]
+            {
+                test: function (filePath) {
+                    return (/\.less$/.test(filePath) && !/\.global\.less$/.test(filePath) && !/antd\/.*\.less$/.test(filePath));
+                },
+                loader: ExtractTextPlugin.extract('css?modules&localIdentName=[local]___[hash:base64:5]!postcss!less')
+            },
+            {
+                test: /\.css$/,
+                loader: ExtractTextPlugin.extract('css')
+            },
+            {
+                test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url?limit=10000&mimetype=application/font-woff"
+            },
+            {
+                test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url?limit=10000&mimetype=application/font-woff"
+            },
+            {
+                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url?limit=10000&mimetype=application/octet-stream"
+            },
+            {
+                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url?limit=10000&mimetype=application/octet-stream"
+            },
+            {
+                test: /\.json$/,
+                loader: 'json'
+            },
+            {
+                test: /font\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url?limit=10000&mimetype=image/svg+xml"
+            }]
     },
-    postcss: function() {
+    postcss: function () {
         return [autoprefixer];
     },
     plugins: [

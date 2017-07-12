@@ -37,9 +37,8 @@ export const UPDATE_SHOW_NEW_RECORD_TIP = 'UPDATE_SHOW_NEW_RECORD_TIP';
 export const UPDATE_FETCHING_RECORD_STATUS = 'UPDATE_FETCHING_RECORD_STATUS';
 import {getJSON, ajaxGet, postJSON} from 'common/ApiUtil';
 
-var CONFIG = require('../../../config.json');
-var serverHost = CONFIG.serverHost;
-
+import config from '../../../config.json'
+var serverHost = config.serverHost;
 export function connectDataBase() {
     return dbConnect();
 }
