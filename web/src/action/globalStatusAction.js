@@ -37,6 +37,9 @@ export const UPDATE_SHOW_NEW_RECORD_TIP = 'UPDATE_SHOW_NEW_RECORD_TIP';
 export const UPDATE_FETCHING_RECORD_STATUS = 'UPDATE_FETCHING_RECORD_STATUS';
 import {getJSON, ajaxGet, postJSON} from 'common/ApiUtil';
 
+var CONFIG = require('../../../config.json');
+var serverHost = CONFIG.serverHost;
+
 export function connectDataBase() {
     return dbConnect();
 }
@@ -71,7 +74,7 @@ export function connectDbError() {
 function dbConnect() {
     return dispatch => {
         dispatch(connectingDb());
-        postJSON('http://127.0.0.1:8001/lich.mock_service/connect_db')
+        postJSON(`http://${serverHost}:8001/lich.mock_service/connect_db`)
             .then((response) => {
                 dispatch(connectDbSuccess(response.mock_db_infos));
             })
