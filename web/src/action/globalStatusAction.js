@@ -73,7 +73,7 @@ export function connectDbError() {
 function dbConnect() {
     return dispatch => {
         dispatch(connectingDb());
-        postJSON(`http://${serverHost}:8001/lich.mock_service/connect_db`)
+        postJSON(`http://${serverHost}:8001/lich.mock_service/db/connect`)
             .then((response) => {
                 dispatch(connectDbSuccess(response.mock_db_infos));
             })
